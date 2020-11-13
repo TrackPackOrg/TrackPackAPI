@@ -12,8 +12,8 @@ const getStates = (req, res) => {
 
 //Obtenemos todos los municipios en base al stateID el cual se manda como query en la peticion GET desde el frontend
 const getCityById = (req, res) => {
-    const { stateID } = req.query;
-    connection.query(`SELECT * FROM municipios where idDepartamento=${stateID}`, (error, results) => {
+    const { stateId } = req.query;
+    connection.query(`SELECT * FROM municipios where idDepartamento=${stateId}`, (error, results) => {
         if (error) {
             return res.status(400).json({ ok: false, error })
         }

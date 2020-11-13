@@ -8,7 +8,7 @@ const { sendVerificationCode } = require('./sendEmailController');
 
 const saveCustomer = (req, res) => {
     //Desestructuramos el objeto, seria lo mismo que tener; const nombre = req.body.nombre;
-    const { nombre, apellido, correo, passwd } = req.body;
+    const { nombre, apellido, correo, passwd, telefono } = req.body;
     //Encriptando la contraseña
     bcrypt.hash(passwd, saltRounds).then((passEncrypt) => {
         //Si se resulve correctamente se ejecuta este codigo
@@ -19,11 +19,18 @@ const saveCustomer = (req, res) => {
                 //Si se produce un error mandamos un JSON con el error
                 return res.status(503).json({ ok: false, error: err });
             }
+            const userId = result.insertId;
             //Enviamos el codigo de verificacion al correo ingresado por el cliente
-            sendVerificationCode(correo, result.insertId);
+            // sendVerificationCode(correo, userId);
 
-            //Si los datos se ingresan correctamente mandamos un JSON con los resultados
-            return res.json({ ok: true, message: result });
+            //guardando el telefono
+            connection.query(`INSERT INTO telefonos(telefono, idCliente) values('${telefono}','${userId}')`, (err2, result2) => {
+                if (err) {
+                    return res.status(503).json({ ok: false, error: err2 });
+                }
+                //Si los datos se ingresan correctamente mandamos un JSON con los resultados
+                return res.json({ ok: true, clientId: userId });
+            });
         });
     }).catch((err) => {
         //Si se produce un error se ejecuta este codigo

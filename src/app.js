@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-
+require('dotenv').config();
 const app = express();
+
 
 //Express moddlewares
 app.use(express.urlencoded({ extended: true }));
@@ -12,8 +13,7 @@ app.use(cors());
 //Configuracion de la base de datos
 require('./config/db');
 
-//Importandoa variables globales
-require('./config/variables');
+
 
 
 //Configuracion de las rutas
@@ -21,9 +21,9 @@ app.use('/customer', require('./routes/customer.routes'));
 app.use('/address', require('./routes/address.routes'));
 
 
-//Colocar puerto en escucha
-app.listen('3000', () => {
-    console.log('Escuchando el puerto 3000');
+//Colocar puerto en escucha 
+app.listen(process.env.PORT, () => {
+    console.log(`Escuchando el puerto ${process.env.PORT}`);
 });
 
 

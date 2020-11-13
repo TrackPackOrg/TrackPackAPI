@@ -8,10 +8,10 @@ const router = Router();
 const { saveCustomer, deleteCustomer } = require('../controllers/customerController');
 
 //Importando middlewares den customer
-const customerMiddlewares = require('../middlewares/customer.middleware');
+const { fieldsValidationRegister, phoneVerify } = require('../middlewares/customer.middleware');
 
 //Registro de usuario en la base de datos 
-router.post('/', [customerMiddlewares.fieldsValidation], saveCustomer);
+router.post('/', [fieldsValidationRegister, phoneVerify], saveCustomer);
 
 
 
