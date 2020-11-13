@@ -13,28 +13,13 @@ app.use(cors());
 //Configuracion de la base de datos
 require('./config/db');
 
-
-
-
 //Configuracion de las rutas
 app.use('/customer', require('./routes/customer.routes'));
 app.use('/address', require('./routes/address.routes'));
+app.use('/login', require('./routes/login.routes'));
 
 
 //Colocar puerto en escucha 
 app.listen(process.env.PORT, () => {
     console.log(`Escuchando el puerto ${process.env.PORT}`);
 });
-
-
-
-
-// function nombre(){
-//     return 'Angel';
-// }
-
-// let nombreFuncion =  () => 'Angel';
-
-// app.get('/msg', (req, res) => {
-//     return res.send('Hola mundo');
-// });
