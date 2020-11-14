@@ -1,7 +1,7 @@
 const connection = require('../config/db');
 
 const addressFieldsValidation = (req, res, next) => {
-    const { idCliente, idMunicipio, latitud, longitud, direccion } = req.body;
+    const { idCliente, idMunicipio, direccion } = req.body;
 
     if (idCliente === undefined || idCliente === '') {
         return res.status(400).json({ ok: false, error: 'idCliente no especificado' });
@@ -27,4 +27,18 @@ const addressFieldsValidation = (req, res, next) => {
     });
 }
 
-module.exports = { addressFieldsValidation };
+const verifyState = (req, res, next) => {
+    const { stateId } = req.query;
+    if (stateId === undefined || stateId === '') {
+        return res.status(400).json({ ok: false, error: 'Municipio no especificado' });
+    }
+    if (isNaN(stateId)) {
+        return res.status(400).json({ ok: false, error: 'El stateId debe de ser numerico' });
+    }
+    if (stateId > 18 || stateId < 1) {
+        return res.status(400).json({ ok: false, error: 'Municipio no valido' });
+    }
+    next();
+}
+
+module.exports = { addressFieldsValidation, verifyState };
