@@ -38,8 +38,26 @@ const saveCustomer = (req, res) => {
     })
 }
 
+const verifyCustomerEmail = (req, res) => {
+    const { code, idCliente } = req.body;
+
+    connection.query(`SELECT verificado from clientes where idCliente=${idCliente}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log(result);
+        if (code === result[0].verificado) {
+            return res.json({ ok: true, message: 'Verificacion completada' });
+        } else {
+            return res.status(400).json({ ok: false, error: 'El codigo ingresado no coincide' });
+        }
+    });
+
+}
+
 const deleteCustomer = (req, res) => {
 
 };
 
-module.exports = { saveCustomer, deleteCustomer };
+module.exports = { saveCustomer, deleteCustomer, verifyCustomerEmail };
