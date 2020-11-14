@@ -2,19 +2,13 @@ const loginFieldsValidation = (req, res, next) => {
     const { correo, passwd } = req.body;
 
     if (correo === undefined || correo === ' ') {
-        return res.status(400).json({ ok: false, error: 'El Correo es Inválido' });
+        return res.status(400).json({ ok: false, error: 'El Correo o Contraseña no son válido' });
     }
     if (passwd === undefined || passwd === ' ') {
-        return res.status(400).json({ ok: false, error: 'Contraseña Inválida' });
+        return res.status(400).json({ ok: false, error: 'Contraseña no válida' });
     }
 
-    //No se si esto va :'''v
-    connection.query(`SELECT * from clientes where passwd=${passwd}`, (error, result) => {
-        if (error) {
-            return res.status(400).json({ ok: false, error: '' })
-        }
-
-    })
-
-
+    next();
 }
+
+module.exports = { loginFieldsValidation }
