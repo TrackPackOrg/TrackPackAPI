@@ -17,7 +17,7 @@ require('./config/db');
 app.use('/customer', require('./routes/customer.routes'));
 app.use('/address', require('./routes/address.routes'));
 app.use('/login', require('./routes/login.routes'));
-
+app.use('/auth', require('./routes/auth.routes'));
 
 //Colocar puerto en escucha 
 app.listen(process.env.PORT, () => {
