@@ -6,6 +6,7 @@ const router = Router();
 
 //Importando funciones de customerController
 const { saveCustomer, deleteCustomer, verifyCustomerEmail } = require('../controllers/customerController');
+const { tokenRequired } = require('../middlewares/auth.middleware');
 
 //Importando middlewares den customer
 const { fieldsValidationRegister, phoneVerify, passwdVerify, verifyEmailFields } = require('../middlewares/customer.middleware');
@@ -13,7 +14,7 @@ const { fieldsValidationRegister, phoneVerify, passwdVerify, verifyEmailFields }
 //Registro de usuario en la base de datos 
 router.post('/', [fieldsValidationRegister, phoneVerify, passwdVerify], saveCustomer);
 
-router.post('/verify', [verifyEmailFields], verifyCustomerEmail);
+router.post('/verify', [tokenRequired, verifyEmailFields], verifyCustomerEmail);
 
 
 

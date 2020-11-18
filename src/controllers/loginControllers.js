@@ -13,6 +13,9 @@ const login = (req, res) => {
         if (result.length === 0) {
             return res.status(400).json({ ok: false, error: 'Correo o Contraseña no validos' });
         }
+        if (!result[0].verificado) {
+            return res.status(403).json({ ok: false, error: 'Su cuenta aun no a sido verificada' })
+        }
 
         const passHash = result[0].passwd;
         bcrypt.compare(passwd, passHash, (error, resultCrypt) => {

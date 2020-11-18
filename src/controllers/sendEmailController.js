@@ -15,9 +15,9 @@ const sendVerificationCode = (email, id) => {
         .send(msg)
         .then(() => {
             console.log('Email sent');
-            connection.query(`UPDATE clientes SET verificado='${code}' WHERE idCliente='${id}'`, () => {
+            connection.query(`INSERT INTO codigos(idCliente, codigo) VALUES('${id}', '${code}')`, () => {
                 console.log(code);
-                console.log('Dato Actualizado');
+                console.log('Codigo guardado');
             })
         })
         .catch((error) => {
