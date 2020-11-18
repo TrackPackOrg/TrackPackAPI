@@ -11,4 +11,8 @@ const loginFieldsValidation = (req, res, next) => {
     next();
 }
 
+const verifyAccount = (req, res, next) => {
+
+}
+
 module.exports = { loginFieldsValidation }

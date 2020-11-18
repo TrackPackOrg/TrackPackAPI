@@ -1,10 +1,14 @@
 const connection = require("../config/db");
+const jwt = require('jsonwebtoken');
 
 const fieldsValidationRegister = (req, res, next) => {
-    const { nombre, apellido, correo, passwd, telefono } = req.body;
+    let { nombre, apellido, correo, passwd, telefono } = req.body;
 
     if (nombre === undefined || nombre === '') {
         return res.status(400).json({ ok: false, error: 'El nombre es obligatorio' });
+    }
+    if (nombre.trim().length > 50) {
+        return res.status(400).json({ ok: false, error: 'El nombre no puede contener mas de 50 caracteres' });
     }
     if (!verifyOnlyLetters(nombre)) {
         return res.status(400).json({ ok: false, error: 'El nombre no debe de contener numeros o caracteres especiales' });
@@ -12,13 +16,19 @@ const fieldsValidationRegister = (req, res, next) => {
     if (apellido === undefined || apellido === '') {
         return res.status(400).json({ ok: false, error: 'El apellido es obligatorio' });
     }
+    if (apellido.trim().length > 50) {
+        return res.status(400).json({ ok: false, error: 'El apellido no puede contener mas de 50 caracteres' });
+    }
     if (!verifyOnlyLetters(apellido)) {
         return res.status(400).json({ ok: false, error: 'El nombre no debe de contener numeros o caracteres especiales' });
     }
     if (correo === undefined || correo === '') {
         return res.status(400).json({ ok: false, error: 'El correo es obligatorio' });
     }
-    if (!verifyEmail(correo)) {
+    if (correo.trim().length > 100) {
+        return res.status(400).json({ ok: false, error: 'El correo no puede contener mas de 100 caracteres' });
+    }
+    if (!verifyEmail(correo.trim())) {
         return res.status(400).json({ ok: false, error: 'El correo no es valido' });
     }
     if (passwd === undefined || passwd === '') {
@@ -27,9 +37,20 @@ const fieldsValidationRegister = (req, res, next) => {
     if (telefono === undefined || telefono === '') {
         return res.status(400).json({ ok: false, error: 'El telefono es obligatorio' });
     }
+    if (telefono.trim().length > 11) {
+        return res.status(400).json({ ok: false, error: 'El telefono no puede contener mas de 11 caracteres' });
+    }
+    if (telefono.trim().length < 11) {
+        return res.status(400).json({ ok: false, error: 'El telefono no puede contener menos de 11 caracteres' });
+    }
     if (passwd.length <= 7) {
         return res.status(400).json({ ok: false, error: 'La contraseña debe tener almenos 8 caracteres' })
     }
+    req.body.nombre = nombre.trim();
+    req.body.apellido = apellido.trim();
+    req.body.telefono = telefono.trim();
+    req.body.correo = correo.trim();
+
     next();
 }
 
@@ -87,7 +108,6 @@ const phoneVerify = (req, res, next) => {
 
 const verifyEmailFields = (req, res, next) => {
     const { code, idCliente } = req.body;
-
     if (code === undefined || code === '') {
         return res.status(400).json({ ok: false, error: 'Codigo no recibido' });
     }
@@ -137,7 +157,7 @@ const verifyOnlyLetters = (word) => {
 }
 
 const verifyEmail = (email) => {
-    const patter = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    const patter = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (patter.exec(email)) {
         return true;
     }

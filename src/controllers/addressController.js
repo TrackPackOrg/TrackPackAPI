@@ -37,7 +37,7 @@ const saveCustomerAddress = async(req, res) => {
             return res.status(400).json({ ok: false, error });
         }
 
-        return res.json({ ok: true, message: result });
+        return res.json({ ok: true, message: 'Direccion registrada satisfactoriamente' });
     });
 }
 
@@ -53,12 +53,12 @@ const getGeocodeFromAddress = async(idMunicipio) => {
                 return { lat: 0, lng: 0 }
             }
             const { municipio, departamento } = result[0];
-            const geo = await axios.get(`${process.env.GOOGLE_URL}${utf8.encode(municipio)} ${utf8.encode(departamento)}, Honduras&key=${process.env.GOOGLE_API_KEY}`).then(res => {
-                return res.data.results[0].geometry.location;
+            axios.get(`${process.env.GOOGLE_URL}${utf8.encode(municipio)} ${utf8.encode(departamento)}, Honduras&key=${process.env.GOOGLE_API_KEY}`).then(res => {
+                resolve(res.data.results[0].geometry.location);
             }).catch(err => {
-                return { lat: 0, lng: 0 };
+                reject({ lat: 0, lng: 0 });
             });
-            resolve(geo);
+
         });
 
     })
