@@ -41,6 +41,18 @@ const saveCustomerAddress = async(req, res) => {
     });
 }
 
+const getAllAddress = (req, res) => {
+    const { idCliente } = req.body;
+
+    connection.query(`SELECT direcciones.idDireccion, municipios.idMunicipio, departamentos.idDepartamento, municipios.municipio, departamentos.departamento, direcciones.direccion from direcciones INNER JOIN municipios on direcciones.idMunicipio = municipios.idMunicipio inner join departamentos on municipios.idDepartamento = departamentos.idDepartamento where idCliente='${idCliente}'`, (error, result) => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, result });
+    })
+}
+
 
 //funciones de utilidad
 
@@ -65,4 +77,4 @@ const getGeocodeFromAddress = async(idMunicipio) => {
 
 }
 
-module.exports = { getStates, getCityById, saveCustomerAddress }
+module.exports = { getStates, getCityById, saveCustomerAddress, getAllAddress }
