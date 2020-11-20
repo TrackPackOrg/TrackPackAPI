@@ -29,5 +29,25 @@ const getPackageByLoadId = (req, res) => {
 
 }
 
+const getCurriers = (req, res) => {
+    connection.query(`SELECT * from curriers`, (error, result) => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, result });
+    });
+}
 
-module.exports = { savePackage, getPackageByLoadId };
+const getPackageType = (req, res) => {
+    connection.query('SELECT * from tipospaquetes', (error, result) => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, result });
+    });
+}
+
+
+module.exports = { savePackage, getPackageByLoadId, getCurriers, getPackageType };
