@@ -1,6 +1,7 @@
 const connection = require('../config/db');
 const axios = require('axios');
 const utf8 = require('utf8');
+const { dbErrorCode } = require('../helpers/dbErrors')
 
 const getStates = (req, res) => {
     connection.query('SELECT * from departamentos', (error, results) => {
@@ -53,6 +54,40 @@ const getAllAddress = (req, res) => {
     })
 }
 
+const deleteAddress = (req, res) => {
+    const { idCliente } = req.body;
+    const { idDireccion } = req.query;
+    if (idDireccion === undefined || idDireccion === '') {
+        return res.json({ ok: false, error: 'Direccion no especificada' });
+    }
+
+    connection.query(`DELETE FROM direcciones where idDireccion='${idDireccion}'`, (error, result) => {
+        if (error) {
+            return res.status(400).json(dbErrorCode(error));
+        }
+        return res.json({ ok: true, message: 'Direccion eliminada correctamente' });
+    })
+};
+
+const updateAddress = async(req, res) => {
+    let { idCliente, idDireccion, idMunicipio, latitud, longitud, direccion } = req.body;
+
+    if (latitud === undefined || latitud === '' && longitud === undefined || longitud === '') {
+        const geo = await getGeocodeFromAddress(idMunicipio);
+        latitud = geo.lat;
+        longitud = geo.lng
+    }
+    connection.query(`UPDATE direcciones set idMunicipio='${idMunicipio}', latitud='${latitud}', longitud='${longitud}', direccion='${direccion}' where idDireccion='${idDireccion}'`, (error, result) => {
+        if (error) {
+            return res.status(400).json({ ok: false, error });
+        }
+
+        return res.json({ ok: true, message: 'Datos actualizados correctamente' });
+    });
+}
+
+
+
 
 //funciones de utilidad
 
@@ -77,4 +112,4 @@ const getGeocodeFromAddress = async(idMunicipio) => {
 
 }
 
-module.exports = { getStates, getCityById, saveCustomerAddress, getAllAddress }
+module.exports = { getStates, getCityById, saveCustomerAddress, getAllAddress, deleteAddress, updateAddress }

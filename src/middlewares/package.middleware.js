@@ -1,5 +1,6 @@
 const connection = require("../config/db");
 
+
 const packageVerify = (req, res, next) => {
     //Middleware que se encarga de verificar los campos de la carga y que estos en realidad existan y correspondan al usuario en la base de datos
 

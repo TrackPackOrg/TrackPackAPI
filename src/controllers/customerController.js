@@ -84,6 +84,28 @@ const verifyCustomerEmail = (req, res) => {
 
 }
 
+const getProfile = (req, res) => {
+    const { idCliente } = req.body;
+    connection.query(`SELECT telefonos.idTelefono, CONCAT(clientes.nombre, ' ',clientes.apellido) as 'nombre', clientes.email, telefonos.telefono from clientes inner join telefonos on clientes.idCliente = telefonos.idCliente`, (error, result) => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, result });
+    })
+}
+
+const updatePhone = (req, res) => {
+    const { idCliente, idTelefono, telefono } = req.body;
+    connection.query(`UPDATE telefonos set telefono='${telefono}' where idTelefono='${idTelefono}'`, (error, resutl) => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, message: 'Telefono actualizado correctamente' });
+    })
+}
+
 const deleteCustomer = (req, res) => {
 
 };
@@ -93,4 +115,4 @@ const deleteCustomer = (req, res) => {
 
 
 
-module.exports = { saveCustomer, deleteCustomer, verifyCustomerEmail };
+module.exports = { saveCustomer, deleteCustomer, verifyCustomerEmail, getProfile, updatePhone };

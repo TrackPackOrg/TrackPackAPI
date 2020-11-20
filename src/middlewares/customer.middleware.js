@@ -84,11 +84,24 @@ const passwdVerify = (req, res, next) => {
 }
 
 const phoneVerify = (req, res, next) => {
-    const { telefono } = req.body;
-    let phoneSplit = telefono.split('-');
-    if (!verifyOnlyNumbers(phoneSplit)) {
+    const { telefono, idTelefono } = req.body;
+
+    if (idTelefono === undefined || idTelefono === '') {
+        return res.status(400).json({ ok: false, error: 'idTelefono no especificado' });
+    }
+    if (telefono === undefined || telefono === '') {
+        return res.status(400).json({ ok: false, error: 'El telefono es obligatorio' });
+    }
+    if (telefono.trim().length > 11) {
+        return res.status(400).json({ ok: false, error: 'El telefono no puede contener mas de 11 caracteres' });
+    }
+    if (!verifyOnlyNumbers(telefono)) {
         return res.status(400).json({ ok: false, error: `El numero no debe de estar compuesto por caracteres` })
     }
+    if (telefono.trim().length < 11) {
+        return res.status(400).json({ ok: false, error: 'El telefono no puede contener menos de 11 caracteres' });
+    }
+    let phoneSplit = telefono.split('-');
 
     let newPhoneFormat = "";
     if (phoneSplit.length >= 1) {
