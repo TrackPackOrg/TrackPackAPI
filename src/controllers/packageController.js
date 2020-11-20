@@ -49,5 +49,28 @@ const getPackageType = (req, res) => {
     });
 }
 
+const deletePackage = (req, res) => {
+    const { idPaquete } = req.query;
+    connection.query(`DELETE from paquetes where idPaquete='${idPaquete}'`, (error, result) => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, message: 'Paquete eliminado correctamente' });
+    });
+};
 
-module.exports = { savePackage, getPackageByLoadId, getCurriers, getPackageType };
+const updatePackage = (req, res) => {
+    const { idCarga, trackingUsa, idTipo, descripcion, idCurrier, idCliente, idPaquete } = req.body;
+    connection.query(`UPDATE paquetes set idCarga='${idCarga}', trackingUsa='${trackingUsa}', idTipo='${idTipo}', descripcion='${descripcion}', idCurrier='${idCurrier}' where idPaquete='${idPaquete}'`, (error, result) => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, message: 'Paquete actualizado correctamente' });
+    })
+
+}
+
+
+module.exports = { savePackage, getPackageByLoadId, getCurriers, getPackageType, deletePackage, updatePackage };
