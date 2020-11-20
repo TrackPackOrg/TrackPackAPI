@@ -66,9 +66,7 @@ const packageVerify = (req, res, next) => {
             return;
         }
         console.log(results[0].idCarga);
-        if (results[0].idCarga !== parseInt(idCarga)) {
-            return res.status(400).json({ ok: false, error: 'La carga especificada no corresponde al cliente' });
-        }
+
         connection.query(`SELECT idCurrier from curriers`, (error2, result2) => {
             let currierFound = false;
             if (error2) {

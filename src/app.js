@@ -7,8 +7,6 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const app = express();
 
 
-
-
 //Express moddlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
