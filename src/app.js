@@ -23,6 +23,7 @@ const limiter = rateLimit({
 });
 
 app.use('/login', limiter);
+app.use('/login/employee', limiter);
 
 
 //Configuracion de la base de datos
@@ -35,6 +36,7 @@ app.use('/login', require('./routes/login.routes'));
 app.use('/auth', require('./routes/auth.routes'));
 app.use('/load', require('./routes/loads.routes'));
 app.use('/package', require('./routes/package.routes'));
+app.use('/employee', require('./routes/employee.routes'));
 
 //Colocar puerto en escucha 
 app.listen(process.env.PORT, () => {

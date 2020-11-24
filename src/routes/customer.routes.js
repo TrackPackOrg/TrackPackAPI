@@ -9,7 +9,9 @@ const { saveCustomer, deleteCustomer, verifyCustomerEmail, getProfile, updatePho
 const { tokenRequired } = require('../middlewares/auth.middleware');
 
 //Importando middlewares den customer
-const { fieldsValidationRegister, phoneVerify, passwdVerify, verifyEmailFields } = require('../middlewares/customer.middleware');
+const { fieldsValidationRegister, verifyEmailFields, phoneVerify } = require('../middlewares/customer.middleware');
+
+const { passwdVerify } = require('../helpers/utilies');
 
 //Registro de usuario en la base de datos 
 router.post('/', [fieldsValidationRegister, phoneVerify, passwdVerify], saveCustomer);
