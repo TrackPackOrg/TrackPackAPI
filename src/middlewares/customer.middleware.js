@@ -1,5 +1,6 @@
 const connection = require("../config/db");
 const jwt = require('jsonwebtoken');
+const { verifyOnlyLetters, verifyEmail, verifyIfHonduras, verifyReapeatCharacter } = require("../helpers/utilies");
 
 const fieldsValidationRegister = (req, res, next) => {
     let { nombre, apellido, correo, passwd, telefono } = req.body;
@@ -10,8 +11,14 @@ const fieldsValidationRegister = (req, res, next) => {
     if (nombre.trim().length > 50) {
         return res.status(400).json({ ok: false, error: 'El nombre no puede contener mas de 50 caracteres' });
     }
+    if (nombre.trim().length < 2) {
+        return res.status(400).json({ ok: false, error: 'El nombre debe contener almenos 2 caracteres' });
+    }
     if (!verifyOnlyLetters(nombre)) {
         return res.status(400).json({ ok: false, error: 'El nombre no debe de contener numeros o caracteres especiales' });
+    }
+    if (verifyReapeatCharacter(nombre)) {
+        return res.status(400).json({ ok: false, error: 'El nombre no es valido' })
     }
     if (apellido === undefined || apellido === '') {
         return res.status(400).json({ ok: false, error: 'El apellido es obligatorio' });
@@ -19,8 +26,14 @@ const fieldsValidationRegister = (req, res, next) => {
     if (apellido.trim().length > 50) {
         return res.status(400).json({ ok: false, error: 'El apellido no puede contener mas de 50 caracteres' });
     }
+    if (apellido.trim().length < 2) {
+        return res.status(400).json({ ok: false, error: 'El apellido debe de contener al menos 2 caracteres' });
+    }
     if (!verifyOnlyLetters(apellido)) {
-        return res.status(400).json({ ok: false, error: 'El nombre no debe de contener numeros o caracteres especiales' });
+        return res.status(400).json({ ok: false, error: 'El apellido no debe de contener numeros o caracteres especiales' });
+    }
+    if (verifyReapeatCharacter(apellido)) {
+        return res.status(400).json({ ok: false, error: 'El apellido no es valido' })
     }
     if (correo === undefined || correo === '') {
         return res.status(400).json({ ok: false, error: 'El correo es obligatorio' });
@@ -37,85 +50,69 @@ const fieldsValidationRegister = (req, res, next) => {
     if (telefono === undefined || telefono === '') {
         return res.status(400).json({ ok: false, error: 'El telefono es obligatorio' });
     }
-    if (telefono.trim().length > 11) {
-        return res.status(400).json({ ok: false, error: 'El telefono no puede contener mas de 11 caracteres' });
-    }
-    if (telefono.trim().length < 11) {
-        return res.status(400).json({ ok: false, error: 'El telefono no puede contener menos de 11 caracteres' });
-    }
     if (passwd.length <= 7) {
         return res.status(400).json({ ok: false, error: 'La contraseña debe tener almenos 8 caracteres' })
     }
-    req.body.nombre = nombre.trim();
-    req.body.apellido = apellido.trim();
+    req.body.nombre = nombre.trim().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
+    req.body.apellido = apellido.trim().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
     req.body.telefono = telefono.trim();
     req.body.correo = correo.trim();
 
     next();
 }
 
-const passwdVerify = (req, res, next) => {
-    const passwd = req.body.passwd;
-    let mayuscula, numero;
-    if (passwd.length < 8) {
-        return res.status(400).json({ ok: false, error: 'La contraseña debe contener almenos 8 caracteres' });
-    }
-    for (let i = 0; i < passwd.length; i++) {
-        if (passwd.charCodeAt(i) >= 65 && passwd.charCodeAt(i) <= 90 || passwd.charCodeAt(i) === 209) {
-            mayuscula = true;
-            if (numero) {
-                break;
-            }
-        }
-        if (!isNaN(passwd[i])) {
-            numero = true;
-            if (mayuscula) {
-                break;
-            }
-        }
-    }
-    if (!mayuscula) {
-        return res.status(400).json({ ok: false, error: 'La contraseña debe contener almenos 1 letra en mayuscula' });
-    }
-    if (!numero) {
-        return res.status(400).json({ ok: false, error: 'La contraseña debe contener almenos 1 numero' });
-    }
-    next();
-}
-
 const phoneVerify = (req, res, next) => {
-    const { telefono, idTelefono } = req.body;
+    let { telefono } = req.body;
+    const patter = /^[0-9-]*$/
 
-    if (idTelefono === undefined || idTelefono === '') {
-        return res.status(400).json({ ok: false, error: 'idTelefono no especificado' });
-    }
     if (telefono === undefined || telefono === '') {
         return res.status(400).json({ ok: false, error: 'El telefono es obligatorio' });
     }
-    if (telefono.trim().length > 11) {
-        return res.status(400).json({ ok: false, error: 'El telefono no puede contener mas de 11 caracteres' });
-    }
-    if (!verifyOnlyNumbers(telefono)) {
+    if (!patter.exec(telefono)) {
         return res.status(400).json({ ok: false, error: `El numero no debe de estar compuesto por caracteres` })
     }
-    if (telefono.trim().length < 11) {
-        return res.status(400).json({ ok: false, error: 'El telefono no puede contener menos de 11 caracteres' });
-    }
+
     let phoneSplit = telefono.split('-');
 
     let newPhoneFormat = "";
-    if (phoneSplit.length >= 1) {
+
+    console.log(phoneSplit);
+    if (phoneSplit.length > 1) {
         for (let i = 0; i < phoneSplit.length; i++) {
             newPhoneFormat += phoneSplit[i].toString();
         }
         if (newPhoneFormat.length > 11) {
-            return res.status(400).json({ ok: false, error: 'El numero no debe de contener mas de 11 digitos' });
+            return res.status(400).json({ ok: false, error: 'El numero no debe de contener mas de 8 digitos' });
         } else if (newPhoneFormat.length < 11) {
-            return res.status(400).json({ ok: false, error: 'El numero debe de contener 11 digitos' });
+            return res.status(400).json({ ok: false, error: 'El numero debe de contener 8 digitos' });
         }
         req.body.telefono = newPhoneFormat;
+    } else {
+        if (telefono.length !== 11) {
+            return res.status(400).json({ ok: false, error: 'Numero de telefono no valido' });
+        }
     }
-    next();
+    telefono = req.body.telefono;
+    if (!verifyIfHonduras(telefono)) {
+        return res.status(400).json({ ok: false, error: 'El numero de telefono no es valido para Honduras' });
+    }
+
+    //Validar de ser celular si este ya se encuentra registrado
+    if (telefono[3] == '9' || telefono[3] == '8' || telefono[3] == '3') {
+        connection.query(`SELECT * from celulares where celular='${telefono}'`, (error, result) => {
+            if (error) {
+                console.log(error);
+                return;
+            }
+            if (result.length !== 0) {
+                return res.status(400).json({ ok: false, error: 'Numero de celular ya registrado' });
+            } else {
+                next();
+            }
+        })
+    } else {
+        next();
+    }
 }
 
 
@@ -158,26 +155,7 @@ const verifyOnlyNumbers = (numbersArr) => {
     return true;
 }
 
-const verifyOnlyLetters = (word) => {
-    let pattern = /[A-Za-z ñéáíóúÁÉÍÓÚ]+/;
-    for (let i = 0; i < word.length; i++) {
-        if (!pattern.exec(word[i])) {
-            console.log(word[i]);
-            return false;
-        }
-    }
-    return true;
-}
-
-const verifyEmail = (email) => {
-    const patter = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (patter.exec(email)) {
-        return true;
-    }
-    return false;
-}
-
-module.exports = { fieldsValidationRegister, phoneVerify, passwdVerify, verifyEmailFields };
+module.exports = { fieldsValidationRegister, phoneVerify, verifyEmailFields };
 
 
 

@@ -1,4 +1,5 @@
 const connection = require('../config/db');
+const { verifyLoadDispatch } = require('../helpers/verifyLoadDispatch');
 
 const savePackage = (req, res) => {
     const { idCarga, trackingUsa, idTipo, descripcion, idCurrier, idCliente } = req.body;
@@ -69,8 +70,33 @@ const updatePackage = (req, res) => {
         }
         return res.json({ ok: true, message: 'Paquete actualizado correctamente' });
     })
+}
 
+const getPackageByQuery = (req, res) => {
+    const pattern = /^[A-Za-z0-9]*$/;
+    const { trackingUsa } = req.query;
+    if (trackingUsa === undefined || trackingUsa === '') {
+        return res.json({ ok: true, results: [] });
+    }
+    if (pattern.exec(trackingUsa)) {
+        connection.query(`select paquetes.idPaquete, paquetes.trackingUsa, clientes.idCliente, CONCAT(clientes.nombre, ' ', clientes.apellido) as 'nombre' from paquetes inner join cargas on paquetes.idCarga = cargas.idCarga inner join clientes on clientes.idCliente = cargas.idCliente where paquetes.trackingUsa like '${trackingUsa}%' && ISNULL(paquetes.recibidoPor);`, (error, results) => {
+            return res.json({ ok: true, results });
+        })
+    } else {
+        return res.status(400).json({ ok: false, error: 'Solo se permiten numeros y digitos' });
+    }
+}
+
+const registerPackage = (req, res) => {
+    const { idEmpleado, idPaquete, datetimeRecibido } = req.body;
+    connection.query(`UPDATE paquetes set recibidoPor='${idEmpleado}', datetimeRecibido='${datetimeRecibido}' where idPaquete='${idPaquete}'`, (error, result) => {
+        if (error) {
+            return res.status(400).json({ ok: false, error: 'Se produjo un error al registrar el paquete' });
+        }
+        verifyLoadDispatch(idPaquete);
+        return res.json({ ok: true, message: 'Paquete registrado correctamente' });
+    })
 }
 
 
-module.exports = { savePackage, getPackageByLoadId, getCurriers, getPackageType, deletePackage, updatePackage };
+module.exports = { savePackage, getPackageByLoadId, getCurriers, getPackageType, deletePackage, updatePackage, getPackageByQuery, registerPackage };

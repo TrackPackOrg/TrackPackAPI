@@ -1,7 +1,9 @@
 const connection = require('../config/db');
+const { verifyReapeatCharacter } = require('../helpers/utilies');
 
 const addressFieldsValidation = (req, res, next) => {
     const { idMunicipio, direccion, idCliente } = req.body;
+    const patter = /^[#.0-9a-zA-Z\s,-]+$/
 
     if (idMunicipio === undefined || idMunicipio === '') {
         return res.status(400).json({ ok: false, error: 'idMunicipio no especificado' });
@@ -11,8 +13,17 @@ const addressFieldsValidation = (req, res, next) => {
     }
 
     if (direccion.trim().length < 8) {
-        return res.status(400).json({ ok: false, error: 'La direccion debe de contener almenos 8 caracteres' });
+        return res.status(400).json({ ok: false, error: 'La direccion debe de contener al menos 8 caracteres' });
     }
+
+    if (!patter.exec(direccion)) {
+        return res.status(400).json({ ok: false, error: 'El formato de la direccion no es valido' })
+    }
+
+    if (verifyReapeatCharacter(direccion)) {
+        return res.status(400).json({ ok: false, error: 'La direccion no puede contener 3 caracteres consecutivos del mismo tipo' });
+    }
+
     connection.query(`SELECT * from clientes where idCliente=${idCliente}`, (error, result) => {
         if (error) {
             return res.status(400).json({ ok: false, error })
@@ -72,5 +83,6 @@ const addressCustomerValidation = (req, res, next) => {
         }
     })
 }
+
 
 module.exports = { addressFieldsValidation, verifyState, addressCustomerValidation };

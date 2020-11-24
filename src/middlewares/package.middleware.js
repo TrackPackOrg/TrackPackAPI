@@ -108,5 +108,28 @@ const packageVerify = (req, res, next) => {
 
 };
 
+const verifyIsLoadReady = (req, res, next) => {
+    const { idCarga } = req.body;
+    connection.query(`SELECT idEstado from cargas where idCarga='${idCarga}'`, (error, results) => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        let { idEstado } = results[0];
+        if (idEstado === 2) {
+            connection.query(`UPDATE cargas set idEstado='${1}' where idCarga='${idCarga}'`, (error2, results2) => {
+                if (error2) {
+                    console.log(error2);
+                    return;
+                }
+                console.log('Cambio de estado');
+                next();
+            });
+        } else {
+            next();
+        }
+    })
+}
 
-module.exports = { packageVerify };
+
+module.exports = { packageVerify, verifyIsLoadReady };

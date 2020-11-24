@@ -9,6 +9,7 @@ const { sendVerificationCode } = require('./sendEmailController');
 const jwt = require('jsonwebtoken');
 
 const { dbErrorCode } = require('../helpers/dbErrors');
+const { verifyIsMobile } = require('../helpers/verifyTypePhone');
 
 const saveCustomer = (req, res) => {
     //Desestructuramos el objeto, seria lo mismo que tener; const nombre = req.body.nombre;
@@ -24,12 +25,22 @@ const saveCustomer = (req, res) => {
                 return res.status(400).json(dbErrorCode(err));
             }
             const userId = result.insertId;
+            let table = '';
+            let field = '';
             //Enviamos el codigo de verificacion al correo ingresado por el cliente
             sendVerificationCode(correo, userId);
 
+            if (verifyIsMobile(telefono)) {
+                table = 'celulares';
+                field = 'celular';
+            } else {
+                field = 'telefono'
+                table = 'telefonos';
+            }
+
             //guardando el telefono
-            connection.query(`INSERT INTO telefonos(telefono, idCliente) values('${telefono}','${userId}')`, (err2, result2) => {
-                if (err) {
+            connection.query(`INSERT INTO ${table}(${field}, idCliente) values('${telefono}','${userId}')`, (err2, result2) => {
+                if (err2) {
                     return res.status(500).json({ ok: false, error: err2 });
                 }
 

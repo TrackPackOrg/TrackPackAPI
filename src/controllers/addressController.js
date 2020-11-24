@@ -33,24 +33,53 @@ const saveCustomerAddress = async(req, res) => {
         latitud = geo.lat;
         longitud = geo.lng
     }
-    connection.query(`INSERT INTO direcciones(idCliente, idMunicipio, latitud, longitud, direccion) VALUES('${idCliente}', '${idMunicipio}', '${latitud}', '${longitud}', '${direccion}')`, (error, result) => {
+    connection.query(`INSERT INTO direcciones(idCliente, idMunicipio, latitud, longitud, direccion) VALUES('${idCliente}', '${idMunicipio}', '${latitud}', '${longitud}', '${direccion}')`, (error, results) => {
         if (error) {
             return res.status(400).json({ ok: false, error });
         }
 
-        return res.json({ ok: true, message: 'Direccion registrada satisfactoriamente' });
+        connection.query(`SELECT direccionDefecto from clientes where idCliente='${idCliente}'`, (error2, results2) => {
+            if (error2) {
+                console.log(error2);
+                return;
+            }
+            if (results2.length === 0 || results2[0].direccionDefecto == null) {
+                connection.query(`UPDATE clientes set direccionDefecto='${results.insertId}' where idCliente='${idCliente}'`, (error3, results3) => {
+                    if (error3) {
+                        console.log(error3);
+                        return;
+                    }
+                    return res.json({ ok: true, message: 'Direccion registrada satisfactoriamente y establecida como direccion por defecto' });
+                })
+            } else {
+                return res.json({ ok: true, message: 'Direccion registrada satisfactoriamente' });
+            }
+        })
+
     });
 }
 
 const getAllAddress = (req, res) => {
     const { idCliente } = req.body;
 
-    connection.query(`SELECT direcciones.idDireccion, municipios.idMunicipio, departamentos.idDepartamento, municipios.municipio, departamentos.departamento, direcciones.direccion from direcciones INNER JOIN municipios on direcciones.idMunicipio = municipios.idMunicipio inner join departamentos on municipios.idDepartamento = departamentos.idDepartamento where idCliente='${idCliente}'`, (error, result) => {
+    connection.query(`SELECT direcciones.idDireccion, municipios.idMunicipio, departamentos.idDepartamento, municipios.municipio, departamentos.departamento, direcciones.direccion from direcciones INNER JOIN municipios on direcciones.idMunicipio = municipios.idMunicipio inner join departamentos on municipios.idDepartamento = departamentos.idDepartamento where idCliente='${idCliente}'`, (error, results) => {
         if (error) {
             console.log(error);
             return;
         }
-        return res.json({ ok: true, result });
+        connection.query(`SELECT direccionDefecto from clientes where idCliente='${idCliente}'`, (error2, results2) => {
+            if (error2) {
+                console.log(error2);
+                return;
+            }
+            for (let i = 0; i < results.length; i++) {
+                if (results2[0].direccionDefecto == results[i].idDireccion) {
+                    results[i].porDefecto = true;
+                    break;
+                }
+            }
+            return res.json({ ok: true, results });
+        })
     })
 }
 
@@ -86,6 +115,21 @@ const updateAddress = async(req, res) => {
     });
 }
 
+const updateDefaultAddress = (req, res) => {
+    const { idCliente, direccionDefecto } = req.body;
+    if (direccionDefecto === undefined || direccionDefecto === '') {
+        return res.status(400).json({ ok: false, error: 'No se ha especificado la direccion por defecto' });
+    }
+
+    connection.query(`UPDATE clientes set direccionDefecto='${direccionDefecto}' where idCliente='${idCliente}'`, (error, results) => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, message: 'Direccion por defecto actualizada correctamente' });
+    })
+}
+
 
 
 
@@ -112,4 +156,4 @@ const getGeocodeFromAddress = async(idMunicipio) => {
 
 }
 
-module.exports = { getStates, getCityById, saveCustomerAddress, getAllAddress, deleteAddress, updateAddress }
+module.exports = { getStates, getCityById, saveCustomerAddress, getAllAddress, deleteAddress, updateAddress, updateDefaultAddress }
