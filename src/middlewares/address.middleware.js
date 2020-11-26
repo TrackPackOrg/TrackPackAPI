@@ -3,7 +3,7 @@ const { verifyReapeatCharacter } = require('../helpers/utilies');
 
 const addressFieldsValidation = (req, res, next) => {
     const { idMunicipio, direccion, idCliente } = req.body;
-    const patter = /^[#.0-9a-zA-Z\s,-]+$/
+    const patter = /^[#.0-9a-zA-Z\s,áéíóúÁÉÍÓÚüÜñÑ-]*$/
 
     if (idMunicipio === undefined || idMunicipio === '') {
         return res.status(400).json({ ok: false, error: 'idMunicipio no especificado' });

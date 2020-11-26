@@ -90,7 +90,7 @@ const verifyCustomerEmail = (req, res) => {
                 return res.status(400).json({ ok: false, error: 'Codigo no valido' });
             }
 
-        });
+        }); 
     })
 
 }
@@ -108,7 +108,7 @@ const getProfile = (req, res) => {
 
 const updatePhone = (req, res) => {
     const { idCliente, idTelefono, telefono } = req.body;
-    connection.query(`UPDATE telefonos set telefono='${telefono}' where idTelefono='${idTelefono}'`, (error, resutl) => {
+    connection.query(`UPDATE telefonos set telefono='${telefono}' where idTelefono='${idTelefono}'`, (error, results) => {
         if (error) {
             console.log(error);
             return;
@@ -118,12 +118,30 @@ const updatePhone = (req, res) => {
 }
 
 const deleteCustomer = (req, res) => {
-
+    const { idCliente } = req.body;
+    connection.query(`UPDATE clientes set activo = 0 where idCliente='${idCliente}'`, (error, results) => {
+        if(error){
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, message: 'La cuena ha sido eliminada correctamente' });
+    })
 };
 
+const getAllCustomers = (req, res) => {
+    connection.query(`SELECT clientes.idCliente, clientes.nombre, clientes.apellido, clientes.email, clientes.fechaRegistro, clientes.ultimoInicio, clientes.activo from clientes`, (error, results) => {
+        if(error){
+            console.log(error);
+            return;
+        }
+        
+        return res.json({ ok: true, results });
+    })
+}
 
 
 
 
 
-module.exports = { saveCustomer, deleteCustomer, verifyCustomerEmail, getProfile, updatePhone };
+
+module.exports = { saveCustomer, deleteCustomer, verifyCustomerEmail, getProfile, updatePhone, getAllCustomers };

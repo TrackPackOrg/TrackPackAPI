@@ -1,8 +1,16 @@
-const { json } = require("express")
 const connection = require('../config/db');
 
 const verify = (req, res) => {
-    return res.json({ ok: true, message: 'Autorizado' });
+    const { idCliente } = req.body;
+    const time = new Date().toISOString().slice(0, 10);
+    console.log(time)
+    connection.query(`UPDATE clientes set ultimoInicio='${time}' where idCliente='${idCliente}'`, ( error, results ) => {
+        if(error){
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, message: 'Autorizado' });
+    })
 }
 
 const dashboard = (req, res) => {
