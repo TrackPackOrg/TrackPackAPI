@@ -3,7 +3,7 @@ const { verifyReapeatCharacter, verifyOnlyLetters } = require("../helpers/utilie
 
 const fieldsValidationEmployee = (req, res, next) => {
     const { nombre, apellido, userLogin, passwd } = req.body;
-    const patter = /^[A-Za-z0-9_.]*$/
+    const patter = /^[A-Za-z0-9_.ñÑ]*$/
 
     if (nombre === undefined || nombre === '') {
         return res.status(400).json({ ok: false, error: 'El nombre es obligatorio' });

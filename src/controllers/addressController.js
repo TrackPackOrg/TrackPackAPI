@@ -52,7 +52,7 @@ const saveCustomerAddress = async(req, res) => {
                     return res.json({ ok: true, message: 'Direccion registrada satisfactoriamente y establecida como direccion por defecto' });
                 })
             } else {
-                return res.json({ ok: true, message: 'Direccion registrada satisfactoriamente' });
+                return res.json({ ok: true, message: 'Direccion registrada satisfactoriamente', idDireccion: results[0].insertId });
             }
         })
 

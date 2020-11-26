@@ -42,14 +42,14 @@ const getEmployees = (req, res) => {
             console.log(error);
             return;
         }
-        results = results.filter(employee => employee.idEmpleado !== idEmpleado);
+        results = results.filter(employee => employee.idEmpleado !== idEmpleado && employee.userLogin!== 'admin' && employee.activo === 1);
         return res.json({ ok: true, results });
     });
 }
 
 const saveEmployee = (req, res) => {
     const { nombre, apellido, userLogin, passwd } = req.body;
-    let passwdHash = bcrypt.hashSync(passwd, 10);
+    const passwdHash = bcrypt.hashSync(passwd, 10);
     connection.query(`INSERT INTO empleados(nombre, apellido, userLogin, passwd) VALUES('${nombre}', '${apellido}', '${userLogin}', '${passwdHash}')`, (error, results) => {
         if (error) {
             console.log(error);
@@ -59,6 +59,41 @@ const saveEmployee = (req, res) => {
     })
 }
 
+const verifyPassword = (req, res) => {
+    const { idEmpleado, passwd } = req.body;
+    if(passwd === undefined || passwd === ''){
+        return res.status(400).json({ ok: false, error: 'Acceso denegado, se requiere su contraseña' })
+    }
+    connection.query(`SELECT passwd from empleados where idEmpleado='${idEmpleado}'`, (error, results) => {
+        if(error){
+            console.log(error);
+            return
+        }
+        console.log(results)
+        const passwdHash = results[0].passwd;
+        if(bcrypt.compareSync(passwd, passwdHash)){
+            return res.json({ ok: true, message: 'Contraseña verificada' });
+        }else{
+            return res.status(401).json({ ok: false, error: 'La contraseña es erronea' });
+        }
+    })
+}
+
+const deleteEmployee = (req, res) => {
+    const { idEmpleado } = req.query;
+    console.log(idEmpleado);
+    if(idEmpleado === undefined || idEmpleado === ''){
+        return res.status(400).json({ ok: false, error: 'El empleado no se ha encontrado' });
+    }
+    connection.query(`UPDATE empleados set activo=0 where idEmpleado='${idEmpleado}'`, (error, results) => {
+        if(error){
+            console.log(error);
+            return;
+        }
+        return res.json({ ok: true, message: 'Empleado eliminado correctamente' });
+    })
+}
 
 
-module.exports = { validUsername, getEmployeeProfile, getEmployees, saveEmployee };
+
+module.exports = { validUsername, getEmployeeProfile, getEmployees, saveEmployee, verifyPassword, deleteEmployee };

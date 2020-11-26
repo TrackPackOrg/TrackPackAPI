@@ -16,6 +16,9 @@ const login = (req, res) => {
         if (!result[0].verificado) {
             return res.status(403).json({ ok: false, error: 'Su cuenta aun no a sido verificada' })
         }
+        if(!result[0].activo){
+            return res.status(401).json({ ok: false, error: 'Su cuena esta inhabilitada, por favor contacte a soporte' });
+        }
 
         const passHash = result[0].passwd;
         bcrypt.compare(passwd, passHash, (error, resultCrypt) => {
@@ -34,7 +37,6 @@ const login = (req, res) => {
 const loginEmployee = (req, res) => {
     const { userLogin } = req.body;
     const passwd = req.body.passwd;
-    console.log(bcrypt.hashSync('admin', 10));
     if (userLogin === undefined || userLogin === '') {
         return res.status(400).json({ ok: false, error: 'Nombre de usuario requerido' });
     }
