@@ -109,6 +109,27 @@ const deleteCustomer = (req, res) => {
     })
 }
 
+const reactiveCustomer = (req, res) => {
+    const { idCliente } = req.body;
+    connection.query(`UPDATE clientes set activo=1 where idCliente='${idCliente}'`, (error, results) => {
+        if(error){
+            return res.status(400).json({ ok: false, error });
+        }
+        return res.json({ ok: true, message: 'Cuenta recativada satisfactoriamente' });
+    })
+}
+
+const passwordChange = (req, res) => {
+    const { passwd, idCliente } = req.body;
+    const passwdHash = bcrypt.hashSync(passwd, 10);
+
+    connection.query(`UPDATE clientes set passwd='${passwdHash}' where idCliente='${idCliente}'`, (error, results) => {
+        if(error){
+            return res.status(400).json({ ok: false, error });
+        }
+        return res.json({ ok: true, message: 'Contraseña cambiada satisfactoriamente' });
+    })
+}
 
 
-module.exports = { validUsername, getEmployeeProfile, getEmployees, saveEmployee, verifyPassword, deleteEmployee, deleteCustomer };
+module.exports = { validUsername, getEmployeeProfile, getEmployees, saveEmployee, verifyPassword, deleteEmployee, deleteCustomer, reactiveCustomer, passwordChange };
