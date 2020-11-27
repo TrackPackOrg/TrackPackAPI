@@ -97,7 +97,7 @@ const verifyCustomerEmail = (req, res) => {
 
 const getProfile = (req, res) => {
     const { idCliente } = req.body;
-    connection.query(`SELECT telefonos.idTelefono, CONCAT(clientes.nombre, ' ',clientes.apellido) as 'nombre', clientes.email, telefonos.telefono from clientes inner join telefonos on clientes.idCliente = telefonos.idCliente`, (error, result) => {
+    connection.query(`SELECT telefonos.idTelefono, CONCAT(clientes.nombre, ' ',clientes.apellido) as 'nombre', clientes.email, telefonos.telefono from clientes inner join telefonos on clientes.idCliente = telefonos.idCliente where idCliente='${idCliente}'`, (error, result) => {
         if (error) {
             console.log(error);
             return;

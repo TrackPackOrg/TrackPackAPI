@@ -26,7 +26,7 @@ module.exports = connection;
 // const connection = mysql.createConnection({
 //     host: 'localhost',
 //     user: 'omgwsyvt_mhaniac',
-//     password: 'Gotoprohardmode1',
+//     password: '',
 //     database: 'omgwsyvt_trackpack'
 // });
 

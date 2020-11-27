@@ -15,7 +15,16 @@ const savePackage = (req, res) => {
 
 const getPackageByLoadId = (req, res) => {
     const { idCarga } = req.query;
-    connection.query(`select paquetes.idPaquete, paquetes.idCarga, paquetes.descripcion, curriers.nombreCurrier, tipospaquetes.tipo, paquetes.trackingUsa from paquetes inner join curriers on paquetes.idCurrier = curriers.idCurrier inner join tipospaquetes on paquetes.idTipo = tipospaquetes.idTipo where paquetes.idCarga='${idCarga}'`, (error, result) => {
+    connection.query(`select paquetes.idPaquete, paquetes.idCarga, paquetes.descripcion, curriers.nombreCurrier, tipospaquetes.tipo, paquetes.trackingUsa, paquetes.datetimeRecibido,
+    CASE
+         WHEN paquetes.recibidoPor IS NOT NULL THEN CONCAT(empleados.nombre, ' ', empleados.apellido )
+         ELSE 'Sin especificar'
+    END as 'recibidoPor'
+    from paquetes
+    inner join curriers on paquetes.idCurrier = curriers.idCurrier
+    inner join tipospaquetes on paquetes.idTipo = tipospaquetes.idTipo
+    left join empleados on paquetes.recibidoPor = empleados.idEmpleado
+    where paquetes.idCarga='${idCarga}'`, (error, result) => {
         if (error) {
             console.log(error);
             return;
