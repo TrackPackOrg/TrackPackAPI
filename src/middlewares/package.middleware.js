@@ -121,7 +121,7 @@ const verifyIsLoadReady = (req, res, next) => {
                 if (error2) {
                     console.log(error2);
                     return;
-                }
+                } 
                 console.log('Cambio de estado');
                 next();
             });

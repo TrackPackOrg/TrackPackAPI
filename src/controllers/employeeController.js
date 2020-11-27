@@ -94,6 +94,21 @@ const deleteEmployee = (req, res) => {
     })
 }
 
+const deleteCustomer = (req, res) => {
+    const { idCliente } = req.query;
+    console.log(idCliente);
+    if(idCliente === undefined || idCliente === ''){
+        return res.status(400).json({ ok: false, error: 'Error al eliminar, el cliente no ha sido detectado' });
+    }
+
+    connection.query(`UPDATE clientes set activo=0 where idCliente='${idCliente}'`, (error, results) => {
+        if(error){
+            return res.status(500).json({ ok: false, error })
+        }
+        return res.json({ ok: true, message: 'El cliente ha sido eliminado satisfactoriamente' });
+    })
+}
 
 
-module.exports = { validUsername, getEmployeeProfile, getEmployees, saveEmployee, verifyPassword, deleteEmployee };
+
+module.exports = { validUsername, getEmployeeProfile, getEmployees, saveEmployee, verifyPassword, deleteEmployee, deleteCustomer };
