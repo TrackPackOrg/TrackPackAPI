@@ -5,7 +5,7 @@
 const dbErrorCode = ({ errno }) => {
     switch (errno) {
         case 1062:
-            return { ok: false, error: 'Correo electronico ya registrado' };
+            return { ok: false, error: 'No se puede registrar porque ya existe' };
         case 1451:
             return { ok: false, error: 'No se puede eliminar el campo porque tienes atributos asociados a el' }
         default:

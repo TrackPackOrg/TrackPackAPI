@@ -1,12 +1,12 @@
 const connection = require('../config/db');
 const { verifyLoadDispatch } = require('../helpers/verifyLoadDispatch');
+const { dbErrorCode } = require('../helpers/dbErrors');
 
 const savePackage = (req, res) => {
     const { idCarga, trackingUsa, idTipo, descripcion, idCurrier, idCliente } = req.body;
     connection.query(`INSERT INTO paquetes(idCarga, trackingUsa, idTipo, descripcion, idCurrier) VALUES('${idCarga}', '${trackingUsa}', '${idTipo}', '${descripcion}', '${idCurrier}')`, (error, result) => {
         if (error) {
-            console.log(error);
-            return;
+            return res.status(400).json({ ok: false, error: dbErrorCode(error) });
         }
 
         return res.json({ ok: true, message: 'Paquete registrado satisfactoriamente', idPaquete: result.insertId });

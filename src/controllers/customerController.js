@@ -134,7 +134,18 @@ const getAllCustomers = (req, res) => {
             console.log(error);
             return;
         }
-        
+        results = results.filter(result => result.activo !== 0);
+        return res.json({ ok: true, results });
+    })
+}
+
+const getInactiveCustomers = (req, res) => {
+    connection.query(`SELECT clientes.idCliente, clientes.nombre, clientes.apellido, clientes.email, clientes.fechaRegistro, clientes.ultimoInicio, clientes.activo from clientes`, (error, results) => {
+        if(error){
+            console.log(error);
+            return;
+        }
+        results = results.filter(result => result.activo !== 1);
         return res.json({ ok: true, results });
     })
 }
@@ -144,4 +155,4 @@ const getAllCustomers = (req, res) => {
 
 
 
-module.exports = { saveCustomer, deleteCustomer, verifyCustomerEmail, getProfile, updatePhone, getAllCustomers };
+module.exports = { saveCustomer, deleteCustomer, verifyCustomerEmail, getProfile, updatePhone, getAllCustomers, getInactiveCustomers };
