@@ -37,6 +37,7 @@ app.use('/auth', require('./routes/auth.routes'));
 app.use('/load', require('./routes/loads.routes'));
 app.use('/package', require('./routes/package.routes'));
 app.use('/employee', require('./routes/employee.routes'));
+app.use('/tracking', require('./routes/tracking.routes'));
 
 //Colocar puerto en escucha 
 app.listen(process.env.PORT, () => {
