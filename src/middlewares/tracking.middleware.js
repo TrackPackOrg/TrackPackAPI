@@ -2,27 +2,12 @@ const connection = require('../config/db');
 const { verifyOnlyLetters } = require('../helpers/utilies');
 
 const validateTrackingFields = (req, res, next) => {
-    const { idCliente, idCarga, idEmpleado, descripcion, datetimeTrack } = req.body;
+    const { idCliente, idCarga } = req.body;
 
     if(idCarga === undefined || idCarga === ''){
         return res.status(400).json({ ok: false, error: 'No se ha especificado una carga' });
     }
 
-    if(idEmpleado === undefined || idEmpleado === ''){
-        return res.status(400).json({ ok: false, error: 'Empleado no especificado' });
-    }
-
-    if(descripcion === undefined || descripcion === ''){
-        return res.status(400).json({ ok: false, error: 'No se ha especificado una descripcion' });
-    }
-
-    if(!verifyOnlyLetters(descripcion)){
-        return res.status(400).json({ ok: false, error: 'La descripcion solo puede estar compuesta por letras' });
-    }
-
-    if(datetimeTrack === undefined || datetimeTrack === ''){
-        req.body.datetimeTrack = new Date().toLocaleString();
-    }
     connection.query(`SELECT * from cargas where idCarga='${idCarga}' && idCliente='${idCliente}'`, (error, results) => {
         if(error){
             return res.status(400).json({ ok: false, error });
