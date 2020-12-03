@@ -65,7 +65,7 @@ const packageVerify = (req, res, next) => {
             console.log(error);
             return;
         }
-        console.log(results[0].idCarga);
+
 
         connection.query(`SELECT idCurrier from curriers`, (error2, result2) => {
             let currierFound = false;

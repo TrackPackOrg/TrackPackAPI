@@ -1,3 +1,6 @@
+const axios = require('axios');
+const URL = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
+
 //Funciones de utilidad
 
 const verifyReapeatCharacter = (word) => {
@@ -69,4 +72,14 @@ const passwdVerify = (req, res, next) => {
     next();
 }
 
-module.exports = { verifyReapeatCharacter, verifyEmail, verifyIfHonduras, verifyOnlyLetters, passwdVerify }
+const getAddressFromCords = async(lat, lng) => {
+    return new Promise((resolve, reject) => {
+        axios.get(`${URL}${lat}, ${lng}&key=${process.env.GOOGLE_API_KEY}`).then((result) => {
+            resolve(result.data.results[0].formatted_address);
+        }).catch((error) => {
+            reject(error.response);
+        })
+    })
+}
+
+module.exports = { verifyReapeatCharacter, verifyEmail, verifyIfHonduras, verifyOnlyLetters, passwdVerify, getAddressFromCords }
